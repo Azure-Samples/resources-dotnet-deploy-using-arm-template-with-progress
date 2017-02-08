@@ -4,10 +4,10 @@ platforms: .Net
 author: anudeepsharma
 ---
 
-#Getting Started with Resources - Deploy Using ARM Template With Progress - in .Net #
+#Getting Started with Resources - Deploy Using A R M Template With Progress - in .Net #
 
-      Azure Resource sample for deploying resources using an ARM template and
-      showing progress.
+          Azure Resource sample for deploying resources using an ARM template and
+          showing progress.
 
 
 ## Running this Sample ##
