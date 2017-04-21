@@ -2,9 +2,9 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
 using Microsoft.Azure.Management.Fluent;
-using Microsoft.Azure.Management.Resource.Fluent;
-using Microsoft.Azure.Management.Resource.Fluent.Core;
-using Microsoft.Azure.Management.Resource.Fluent.Models;
+using Microsoft.Azure.Management.ResourceManager.Fluent;
+using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
+using Microsoft.Azure.Management.ResourceManager.Fluent.Models;
 using Microsoft.Azure.Management.Samples.Common;
 using Newtonsoft.Json.Linq;
 using System;
@@ -25,7 +25,7 @@ namespace DeployUsingARMTemplateWithProgress
 
             try
             {
-                var templateJson = GetTemplate();
+                var templateJson = Utilities.GetArmTemplate("ArmTemplate.json");
 
                 //=============================================================
                 // Create resource group.
@@ -53,15 +53,15 @@ namespace DeployUsingARMTemplateWithProgress
 
                 Utilities.Log("Started a deployment for an Azure App Service: " + deploymentName);
 
-                var deployment = azure.Deployments.GetByGroup(rgName, deploymentName);
+                var deployment = azure.Deployments.GetByResourceGroup(rgName, deploymentName);
                 Utilities.Log("Current deployment status : " + deployment.ProvisioningState);
 
                 while (!(StringComparer.OrdinalIgnoreCase.Equals(deployment.ProvisioningState, "Succeeded") || 
                         StringComparer.OrdinalIgnoreCase.Equals(deployment.ProvisioningState, "Failed") || 
                         StringComparer.OrdinalIgnoreCase.Equals(deployment.ProvisioningState, "Cancelled")))
                 {
-                    SdkContext.DelayProvider.Delay(10000, CancellationToken.None).Wait();
-                    deployment = azure.Deployments.GetByGroup(rgName, deploymentName);
+                    SdkContext.DelayProvider.Delay(10000);
+                    deployment = azure.Deployments.GetByResourceGroup(rgName, deploymentName);
                     Utilities.Log("Current deployment status : " + deployment.ProvisioningState);
                 }
             }
@@ -94,7 +94,7 @@ namespace DeployUsingARMTemplateWithProgress
 
                 var azure = Azure
                     .Configure()
-                    .WithLogLevel(HttpLoggingDelegatingHandler.Level.BASIC)
+                    .WithLogLevel(HttpLoggingDelegatingHandler.Level.Basic)
                     .Authenticate(credentials)
                     .WithDefaultSubscription();
 
@@ -104,21 +104,6 @@ namespace DeployUsingARMTemplateWithProgress
             {
                 Utilities.Log(ex);
             }
-        }
-
-        private static string GetTemplate()
-        {
-            var hostingPlanName = SdkContext.RandomResourceName("hpRSAT", 24);
-            var webAppName = SdkContext.RandomResourceName("wnRSAT", 24);
-            var armTemplateString = System.IO.File.ReadAllText(@".\ARMTemplate\TemplateValue.json");
-
-            var parsedTemplate = JObject.Parse(armTemplateString);
-            parsedTemplate.SelectToken("parameters.hostingPlanName")["defaultValue"] = hostingPlanName;
-            parsedTemplate.SelectToken("parameters.webSiteName")["defaultValue"] = webAppName;
-            parsedTemplate.SelectToken("parameters.skuName")["defaultValue"] = "F1";
-            parsedTemplate.SelectToken("parameters.skuCapacity")["defaultValue"] = 1;
-
-            return parsedTemplate.ToString();
         }
     }
 }
