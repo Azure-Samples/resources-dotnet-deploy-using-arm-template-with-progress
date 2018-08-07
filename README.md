@@ -1,10 +1,10 @@
 ---
-services: Resources
-platforms: .Net
+services: Resource-Manager
+platforms: dotnet
 author: anudeepsharma
 ---
 
-# Getting Started with Resources - Deploy Using ARM Template With Progress - in .Net #
+# Getting started on deploying using an ARM template and show progress in C# #
 
           Azure Resource sample for deploying resources using an ARM template and
           showing progress.
@@ -14,7 +14,7 @@ author: anudeepsharma
 
 To run this sample:
 
-Set the environment variable `AZURE_AUTH_LOCATION` with the full path for an auth file. See [how to create an auth file](https://github.com/Azure/azure-sdk-for-net/blob/Fluent/AUTH.md).
+Set the environment variable `AZURE_AUTH_LOCATION` with the full path for an auth file. See [how to create an auth file](https://github.com/Azure/azure-libraries-for-java/blob/master/AUTH.md).
 
     git clone https://github.com/Azure-Samples/resources-dotnet-deploy-using-arm-template-with-progress.git
 
