@@ -1,7 +1,7 @@
 ---
 services: Resource-Manager
 platforms: dotnet
-author: anudeepsharma
+author: yaohaizh
 ---
 
 # Getting started on deploying using an ARM template and show progress in C# #
@@ -14,7 +14,7 @@ author: anudeepsharma
 
 To run this sample:
 
-Set the environment variable `AZURE_AUTH_LOCATION` with the full path for an auth file. See [how to create an auth file](https://github.com/Azure/azure-libraries-for-java/blob/master/AUTH.md).
+Set the environment variable `AZURE_AUTH_LOCATION` with the full path for an auth file. See [how to create an auth file](https://github.com/Azure/azure-libraries-for-net/blob/master/AUTH.md).
 
     git clone https://github.com/Azure-Samples/resources-dotnet-deploy-using-arm-template-with-progress.git
 
