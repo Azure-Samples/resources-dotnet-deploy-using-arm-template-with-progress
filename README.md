@@ -19,10 +19,10 @@ Set the environment variable `AZURE_AUTH_LOCATION` with the full path for an aut
     git clone https://github.com/Azure-Samples/resources-dotnet-deploy-using-arm-template-with-progress.git
 
     cd resources-dotnet-deploy-using-arm-template-with-progress
-
-    dotnet restore
-
-    dotnet run
+  
+    dotnet build
+    
+    bin\Debug\net452\DeployUsingARMTemplateWithProgress.exe
 
 ## More information ##
 
