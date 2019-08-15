@@ -4,15 +4,15 @@ languages:
 - csharp
 products:
 - azure
-services: Resource-Manager
-platforms: dotnet
-author: yaohaizh
+extensions:
+- services: Resource-Manager
+- platforms: dotnet
 ---
 
 # Getting started on deploying using an ARM template and show progress in C# #
 
-          Azure Resource sample for deploying resources using an ARM template and
-          showing progress.
+ Azure Resource sample for deploying resources using an ARM template and
+ showing progress.
 
 
 ## Running this Sample ##
