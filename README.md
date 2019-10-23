@@ -10,6 +10,7 @@ extensions:
 - services: Resource-Manager
 - platforms: dotnet
 description: "Azure Resource sample for deploying resources using an ARM template and showing progress."
+urlFragment: getting-started-on-deploying-using-an-arm-template-and-show-progress-in-c
 ---
 
 # Get started deploying using an ARM template and show progress (C#)
