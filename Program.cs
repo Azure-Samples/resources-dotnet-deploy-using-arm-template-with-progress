@@ -1,17 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
-using Newtonsoft.Json.Linq;
 using System;
-using System.Threading;
-using Azure.ResourceManager.Samples.Common;
-using Azure.Identity;
-using Azure.ResourceManager;
 using System.Threading.Tasks;
-using Azure.Core;
-using Azure.ResourceManager.Resources;
 using Azure;
+using Azure.Core;
+using Azure.Identity;
 using Azure.ResourceManager.Resources.Models;
+using Azure.ResourceManager.Samples.Common;
+using Azure.ResourceManager.Resources;
+using Azure.ResourceManager;
 
 namespace DeployUsingARMTemplateWithProgress
 {
@@ -38,37 +36,26 @@ namespace DeployUsingARMTemplateWithProgress
                 //=============================================================
                 // Create a deployment for an Azure App Service via an ARM template.
 
-                string applicationDefinitionName = Utilities.CreateRandomName("sampleApplicationDefinition");
+                string deploymentName = Utilities.CreateRandomName("myDeployment");
 
-                Utilities.Log("Starting a deployment for an Azure App Service: " + applicationDefinitionName);
+                Utilities.Log("Starting a deployment for an Azure App Service: " + deploymentName);
 
-                // First we need to get the application definition collection from the resource group
-                ArmApplicationDefinitionCollection applicationDefinitionCollection = resourceGroup.GetArmApplicationDefinitions();
-                // Use the same location as the resource group
-                var input = new ArmApplicationDefinitionData(resourceGroup.Data.Location, ArmApplicationLockLevel.None)
+                // Get the deployment collection from the resource group
+                ArmDeploymentCollection armDeploymentCollection = resourceGroup.GetArmDeployments();
+                Utilities.Log("Load a template JSON, which can originate from local or network sources...");
+                ArmDeploymentContent input = new ArmDeploymentContent(new ArmDeploymentProperties(ArmDeploymentMode.Incremental)
                 {
-                    DisplayName = applicationDefinitionName,
-                    Description = $"{applicationDefinitionName} description",
-                    PackageFileUri = new Uri("https://raw.githubusercontent.com/Azure/azure-managedapp-samples/master/Managed%20Application%20Sample%20Packages/201-managed-storage-account/managedstorage.zip")
-                };
-                ArmOperation<ArmApplicationDefinitionResource> lro = await applicationDefinitionCollection.CreateOrUpdateAsync(WaitUntil.Completed, applicationDefinitionName, input);
-                ArmApplicationDefinitionResource applicationDefinition = lro.Value;
+                    //Template = BinaryData.FromString(File.ReadAllText("appservice-template.json")),
+                    TemplateLink = new ArmDeploymentTemplateLink()
+                    {
+                        Uri = new Uri("https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/quickstarts/microsoft.web/app-service-docs-linux/azuredeploy.json")
+                    },
+                });
+                ArmOperation<ArmDeploymentResource> lro = await armDeploymentCollection.CreateOrUpdateAsync(WaitUntil.Completed, deploymentName, input);
+                ArmDeploymentResource deployment = lro.Value;
 
-                Utilities.Log("Started a deployment for an Azure App Service: " + applicationDefinitionName);
-
-                //Utilities.Log(applicationDefinition.Data);
-
-                //var deployment = azure.Deployments.GetByResourceGroup(rgName, deploymentName);
-                //Utilities.Log("Current deployment status : " + deployment.ProvisioningState);
-
-                //while (!(StringComparer.OrdinalIgnoreCase.Equals(deployment.ProvisioningState, "Succeeded") ||
-                //        StringComparer.OrdinalIgnoreCase.Equals(deployment.ProvisioningState, "Failed") ||
-                //        StringComparer.OrdinalIgnoreCase.Equals(deployment.ProvisioningState, "Cancelled")))
-                //{
-                //    SdkContext.DelayProvider.Delay(10000);
-                //    deployment = azure.Deployments.GetByResourceGroup(rgName, deploymentName);
-                //    Utilities.Log("Current deployment status : " + deployment.ProvisioningState);
-                //}
+                Utilities.Log("Started a deployment for an Azure App Service: " + deploymentName);
+                Utilities.Log("Current deployment status : " + deployment.Data.Properties.ProvisioningState);
             }
             finally
             {
