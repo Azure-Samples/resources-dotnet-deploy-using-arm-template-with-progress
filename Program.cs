@@ -13,24 +13,25 @@ namespace DeployUsingARMTemplateWithProgress
 {
     public class Program
     {
+        private static ResourceIdentifier? _resourceGroupId = null;
         /**
          * Azure Resource sample for deploying resources using an ARM template and
          * showing progress.
          */
         public static async Task RunSample(ArmClient client)
         {
-            // Get default subscription
-            SubscriptionResource subscription = await client.GetDefaultSubscriptionAsync();
-
-            // Create a resource group in the EastUS region
-            string rgName = Utilities.CreateRandomName("ARMTemplateRG");
-            Utilities.Log($"created resource group with name:{rgName}");
-            ArmOperation<ResourceGroupResource> rgLro = await subscription.GetResourceGroups().CreateOrUpdateAsync(WaitUntil.Completed, rgName, new ResourceGroupData(AzureLocation.EastUS));
-            ResourceGroupResource resourceGroup = rgLro.Value;
-            Utilities.Log("Created a resource group with name: " + resourceGroup.Data.Name);
-
             try
             {
+                // Get default subscription
+                SubscriptionResource subscription = await client.GetDefaultSubscriptionAsync();
+
+                // Create a resource group in the EastUS region
+                string rgName = Utilities.CreateRandomName("ARMTemplateRG");
+                Utilities.Log($"created resource group with name:{rgName}");
+                ArmOperation<ResourceGroupResource> rgLro = await subscription.GetResourceGroups().CreateOrUpdateAsync(WaitUntil.Completed, rgName, new ResourceGroupData(AzureLocation.EastUS));
+                ResourceGroupResource resourceGroup = rgLro.Value;
+                Utilities.Log("Created a resource group with name: " + resourceGroup.Data.Name);
+
                 //=============================================================
                 // Create a deployment for an Azure App Service via an ARM template.
 
@@ -43,7 +44,6 @@ namespace DeployUsingARMTemplateWithProgress
                 Utilities.Log("Load a template JSON, which can originate from local or network sources...");
                 ArmDeploymentContent input = new ArmDeploymentContent(new ArmDeploymentProperties(ArmDeploymentMode.Incremental)
                 {
-                    //Template = BinaryData.FromString(File.ReadAllText("appservice-template.json")),
                     TemplateLink = new ArmDeploymentTemplateLink()
                     {
                         Uri = new Uri("https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/quickstarts/microsoft.web/app-service-docs-linux/azuredeploy.json")
@@ -59,9 +59,12 @@ namespace DeployUsingARMTemplateWithProgress
             {
                 try
                 {
-                    Utilities.Log("Deleting Resource Group: " + rgName);
-                    await resourceGroup.DeleteAsync(WaitUntil.Completed);
-                    Utilities.Log("Deleted Resource Group: " + rgName);
+                    if (_resourceGroupId is not null)
+                    {
+                        Utilities.Log($"Deleting Resource Group: {_resourceGroupId}");
+                        await client.GetResourceGroupResource(_resourceGroupId).DeleteAsync(WaitUntil.Completed);
+                        Utilities.Log($"Deleted Resource Group: {_resourceGroupId}");
+                    }
                 }
                 catch (NullReferenceException)
                 {
